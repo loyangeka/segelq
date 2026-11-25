@@ -26,7 +26,9 @@ describe("SegelQ", async () => {
     const pub = await viem.getPublicClient();
     const txHash = await segelq.write.seal([textHash, "BTC > 150k by 2027"]);
     const receipt = await pub.waitForTransactionReceipt({ hash: txHash });
-    const [event] = parseEventLogs({ abi: segelq.abi, logs: receipt.logs, eventName: "Sealed" });
+    const [event] = parseEventLogs({ abi: segelq.abi, logs: receipt.logs, eventName: "Sealed" }) as unknown as Array<{
+      args: { sealId: bigint; sealer: string; textHash: string; label: string; sealedAt: bigint };
+    }>;
     assert.equal(event.args.sealId, 0n);
     assert.equal(event.args.sealer.toLowerCase(), alice.account.address.toLowerCase());
     assert.equal(event.args.textHash, textHash);
