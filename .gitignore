@@ -1,0 +1,18 @@
+# secrets — NEVER commit
+.env
+project.env
+
+# node / hardhat
+node_modules/
+artifacts/
+cache/
+coverage/
+typechain-types/
+
+# ignition local state (deployed addresses are recorded in README + proof/)
+ignition/deployments/chain-31337/
+ignition/deployments/*/journal.jsonl
+
+# misc
+*.log
+.DS_Store
