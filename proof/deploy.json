@@ -1,0 +1,15 @@
+{
+  "contract": "SegelQ",
+  "contractAddress": "0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9",
+  "deployTxHash": "0x7d329b4485be19ba958de86b61e934be4d548a87c8a8609fab5995fa0a259d8f",
+  "evmBlockNumber": 10705793,
+  "receiptStatus": "success",
+  "gasUsed": 484210,
+  "deployerEvm": "0x41acE6E2BAC1C4A18f2863aBF3527595519928C8",
+  "deployerNative": "qor1gxkwdc46c8z2rregvw4lx5n4j4gej2xggz9smx",
+  "deployerEvmNonce": 2,
+  "runtimeCodeBytes": 1993,
+  "network": "qorechain-diana (EVM chain ID 9800)",
+  "evmRpc": "https://evm-testnet.qore.host",
+  "note": "Sent by Hardhat Ignition (pnpm deploy:segelq) inside the EVM authorisation window opened by hybrid tx 46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4. The Ignition CLI process was stopped after the tx had already been mined (its stdout was pipe-buffered), so this record was reconstructed from the on-chain receipt (eth_getTransactionReceipt) and eth_getCode; the contract is fully deployed and answering eth_call (sealCount = 0 at deploy time)."
+}

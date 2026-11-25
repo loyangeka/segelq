@@ -26,15 +26,28 @@ signature, not just a classical one.
 | Contract `SegelQ.sol` | ✅ written, compiled, unit-tested (6/6) |
 | Receipt page (`web/`) | ✅ static page: hash, verify a hybrid tx, read a seal |
 | Project testnet account | ✅ `qor1gxkwdc46c8z2rregvw4lx5n4j4gej2xggz9smx` / `0x41acE6E2BAC1C4A18f2863aBF3527595519928C8` |
-| Faucet funding | ⏳ pending — the official faucet requires a Dashboard sign-in (see BUILD-LOG) |
-| ML-DSA-87 key registration tx | ⏳ after funding |
-| Hybrid window-open tx (the Quantum Pass tx) | ⏳ after funding |
-| Contract deployment | ⏳ after funding |
-| First seal + REST read-back proof | ⏳ after funding |
+| Funding | ✅ 10 QOR received 2026-11-25 (transfer from Eka's testnet wallet, tx `EE8BDE36…06CE5963`) |
+| ML-DSA-87 key registration tx | ✅ `E751C9C92B8947C48D3CB87A46418F21B71A622B1DFB60CFC4ADC7D254BF3E52` (height 10705563, code 0) |
+| Hybrid window-open tx (the Quantum Pass tx) | ✅ `46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4` — `pqc_hybrid_verify: verified` |
+| Contract deployment | ✅ `0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9` (deploy tx below) |
+| First seal + REST read-back proof | ✅ seal id 0 ("genesis"), read back via the receipt-page logic |
 
-Deployed contract address: **PENDING** (written here, with the deploy tx,
-as soon as the deploy lands). Hybrid tx proof: **PENDING** — the raw REST
-records will live in [`proof/`](proof/) and be linked here.
+**Deployed contract address: `0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9`**
+on qorechain-diana (EVM chain ID 9800).
+Deploy tx: `0x7d329b4485be19ba958de86b61e934be4d548a87c8a8609fab5995fa0a259d8f`
+(EVM block 10705793, status success, gasUsed 484210).
+Hybrid window-open tx (the Quantum Pass proof):
+`46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4` —
+REST read-back: [`proof/window-open-tx.json`](proof/window-open-tx.json),
+extracted summary: [`proof/window-open-summary.json`](proof/window-open-summary.json)
+(`PQCHybridSignature` extension present, 64-byte secp256k1 signature,
+`pqc_hybrid_verify` event with `algorithm_id: dilithium5`, `status: verified`).
+First seal: [`proof/receipts/seal-0.json`](proof/receipts/seal-0.json) —
+seal tx `0x18074cf46d4c7f0c0a459be55a4b22998e9cf121cabfc305be0efc5f627358d4`.
+Deployment record: [`proof/deploy.json`](proof/deploy.json).
+Verify any of it yourself:
+`GET https://api-testnet.qore.host/cosmos/tx/v1beta1/txs/<COSMOS_HASH>`,
+or point the receipt page in [`web/`](web/) at the contract above.
 
 ## How the hybrid signature works
 

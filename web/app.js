@@ -2,7 +2,7 @@
 // Reads only: QoreChain REST (hybrid tx proof) + EVM JSON-RPC (contract reads).
 const CONFIG = {
   // Deployed SegelQ contract on qorechain-diana (EVM 9800). Filled in at deploy time.
-  contract: "0x0000000000000000000000000000000000000000",
+  contract: "0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9",
   rest: "https://api-testnet.qore.host",
   evmRpc: "https://evm-testnet.qore.host",
   explorer: "https://explore.qore.network",
@@ -39,13 +39,19 @@ const word = (hex, i) => hex.slice(2 + i * 64, 2 + (i + 1) * 64);
 const wordToBig = (hex, i) => BigInt("0x" + word(hex, i));
 
 function decodeSeal(hex) {
-  // getSeal returns (address, bytes32, string, uint256, uint256)
-  const sealer = "0x" + word(hex, 0).slice(24);
-  const textHash = "0x" + word(hex, 1);
-  const strOff = Number(wordToBig(hex, 2));
-  const sealedAt = wordToBig(hex, 3);
-  const blockNumber = wordToBig(hex, 4);
-  const strStart = 2 + strOff * 2;
+  // getSeal returns a single struct, ABI-encoded as a tuple: word 0 is the
+  // byte offset of the tuple body (0x20), the fields follow inside the
+  // tuple, and the string offset is relative to the tuple start.
+  // (Verified against the live contract 2026-11-25 — see BUILD-LOG.)
+  const base = Number(wordToBig(hex, 0)); // tuple start, in bytes (32)
+  const at = (i) => word(hex, base / 32 + i);
+  const atBig = (i) => BigInt("0x" + at(i));
+  const sealer = "0x" + at(0).slice(24);
+  const textHash = "0x" + at(1);
+  const strOff = Number(atBig(2));
+  const sealedAt = atBig(3);
+  const blockNumber = atBig(4);
+  const strStart = 2 + (base + strOff) * 2;
   const len = Number(BigInt("0x" + hex.slice(strStart, strStart + 64)));
   const bytes = hex.slice(strStart + 64, strStart + 64 + len * 2);
   const label = new TextDecoder().decode(Uint8Array.from(bytes.match(/../g).map((h) => parseInt(h, 16))));

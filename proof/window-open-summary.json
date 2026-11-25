@@ -1,0 +1,23 @@
+{
+  "hash": "46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4",
+  "height": "10705577",
+  "code": 0,
+  "codespace": "",
+  "hybridExtensionFoundAt": [
+    "$.tx.body.extension_options.0.@type",
+    "$.tx_response.tx.body.extension_options.0.@type"
+  ],
+  "classicalSignatureBytes": [
+    64
+  ],
+  "pqcHybridVerifyEvents": [
+    {
+      "address": "qor1gxkwdc46c8z2rregvw4lx5n4j4gej2xggz9smx",
+      "algorithm_id": "dilithium5",
+      "status": "verified"
+    }
+  ],
+  "verified": true,
+  "rawSavedTo": "proof/window-open-tx.json",
+  "restEndpoint": "https://api-testnet.qore.host/cosmos/tx/v1beta1/txs/46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4"
+}

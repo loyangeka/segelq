@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-aee0c61b6276ae609f3c9af7705e1363989344e6",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.22.0"
+  },
+  "userSourceNameMap": {
+    "contracts/SegelQ.sol": "project/contracts/SegelQ.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/SegelQ.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n\n/// @title SegelQ — Quantum-Sealed Prediction Receipts\n/// @notice Seal the hash of a short prediction (or any short text) on\n///         QoreChain. The sealing account authorises its EVM transactions\n///         through a hybrid post-quantum window (secp256k1 + ML-DSA-87,\n///         NIST FIPS 204), so every seal is anchored to a quantum-resistant\n///         signature that the validators verified on chain\n///         (see the `pqc_hybrid_verify` event of the window-open\n///         transaction). The plaintext never goes on chain — only its hash,\n///         a public label, the sealer and the timestamp.\n/// @dev Deliberately minimal: an append-only receipt registry.\ncontract SegelQ {\n    struct Seal {\n        address sealer; // account that sealed the text\n        bytes32 textHash; // keccak256 (or sha256) hash of the sealed text\n        string label; // short public label, e.g. \"BTC above 100k by 2027\"\n        uint256 sealedAt; // block timestamp of the seal\n        uint256 blockNumber; // block the seal landed in\n    }\n\n    Seal[] private _seals;\n\n    /// @notice textHash => first seal id + 1 (0 means \"not sealed yet\").\n    mapping(bytes32 => uint256) public firstSealByHash;\n\n    /// @notice sealer => list of their seal ids.\n    mapping(address => uint256[]) private _sealIdsBySealer;\n\n    event Sealed(\n        uint256 indexed sealId,\n        address indexed sealer,\n        bytes32 indexed textHash,\n        string label,\n        uint256 sealedAt\n    );\n\n    error EmptyLabel();\n\n    /// @notice Seal a text hash with a public label.\n    /// @param textHash sha256 of the prediction text (computed off chain).\n    /// @param label short public label for the receipt.\n    /// @return sealId the id of the new seal (its index in the registry).\n    function seal(bytes32 textHash, string calldata label) external returns (uint256 sealId) {\n        if (bytes(label).length == 0) revert EmptyLabel();\n\n        sealId = _seals.length;\n        _seals.push(\n            Seal({\n                sealer: msg.sender,\n                textHash: textHash,\n                label: label,\n                sealedAt: block.timestamp,\n                blockNumber: block.number\n            })\n        );\n        _sealIdsBySealer[msg.sender].push(sealId);\n        if (firstSealByHash[textHash] == 0) {\n            firstSealByHash[textHash] = sealId + 1;\n        }\n\n        emit Sealed(sealId, msg.sender, textHash, label, block.timestamp);\n    }\n\n    /// @notice Total number of seals in the registry.\n    function sealCount() external view returns (uint256) {\n        return _seals.length;\n    }\n\n    /// @notice Read one seal back by id.\n    function getSeal(uint256 sealId) external view returns (Seal memory) {\n        return _seals[sealId];\n    }\n\n    /// @notice All seal ids created by one account.\n    function sealsOf(address sealer) external view returns (uint256[] memory) {\n        return _sealIdsBySealer[sealer];\n    }\n\n    /// @notice Has this exact text hash ever been sealed?\n    function isSealed(bytes32 textHash) external view returns (bool) {\n        return firstSealByHash[textHash] != 0;\n    }\n}\n"
+      }
+    }
+  }
+}

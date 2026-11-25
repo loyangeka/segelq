@@ -81,3 +81,46 @@ BLOCKED on Eka's faucet sign-in: funding -> register -> window open (hybrid tx) 
 KNOWN DEMO CONSIDERATION: the receipt page calls the public REST/EVM endpoints directly from the
 browser; if the demo host hits CORS limits, serve it with a tiny /lcd proxy (per official docs
 troubleshooting) — decide in the hosting phase.
+
+## ON-CHAIN PHASE — executed 2026-11-25 (after funding)
+Funding: Eka sent **10 QOR** from his own testnet wallet to the project account
+(tx `EE8BDE36…06CE5963`, confirmed in his Dashboard 10:39 WIB). REST balance before: 10,000,000 uqor.
+(The Dashboard faucet itself is rate-limited per account/day, so Eka funded the project account
+with a plain transfer from his faucet-filled wallet instead — same result.)
+
+- `pnpm window register` → **E751C9C92B8947C48D3CB87A46418F21B71A622B1DFB60CFC4ADC7D254BF3E52**
+  (height 10705563, code 0, gas_used 297114; fee 0.1 QOR → balance 9.9 QOR).
+  Raw REST record: `proof/register-tx.json`.
+- `pnpm window open` → **46D849AC7A358CD821FEE250180370532C3030C0391EB8A869E7E72049A192B4**
+  (height 10705577, code 0; window 600 blocks / 5 txs / 3,750,000 uqor).
+  `pnpm verify-tx` read-back (`proof/window-open-tx.json`, `proof/window-open-summary.json`):
+  `PQCHybridSignature` extension present at `tx.body.extension_options[0]`, classical signature
+  64 bytes, and the **`pqc_hybrid_verify` event: {address: qor1gxkw…9smx, algorithm_id: dilithium5,
+  status: verified}** → verified: true. THIS is the Quantum Pass hybrid transaction.
+- `pnpm deploy:segelq` → **SegelQ at 0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9**,
+  deploy tx `0x7d329b4485be19ba958de86b61e934be4d548a87c8a8609fab5995fa0a259d8f`,
+  EVM block 10705793, receipt status success, gasUsed 484210, runtime code 1993 bytes.
+  Record: `proof/deploy.json`; Ignition's own `deployed_addresses.json` agrees.
+  NOTE (process, not chain): the Ignition CLI's stdout was pipe-buffered and the process was
+  stopped after the deploy tx had already been mined and journalled; the deployment was
+  confirmed from the on-chain receipt + `eth_getCode` + Ignition's journal — no re-deploy needed.
+- `pnpm seal` (inside the same window) → **seal id 0**, label `genesis`, text
+  "SegelQ genesis seal — 25 Nov 2026: QoreChain mainnet launches before Q-Day.",
+  SHA-256 `0xb72a12f2d5f62446eec89ce8151dda410d1e2793b9cbf7e2402b12b51098f826`,
+  tx `0x18074cf46d4c7f0c0a459be55a4b22998e9cf121cabfc305be0efc5f627358d4`, EVM block 10705990,
+  status success. Receipt: `proof/receipts/seal-0.json`.
+- Receipt-page check against the REAL chain data (web/app.js logic replicated in Node):
+  **BUG FOUND + FIXED** — `decodeSeal` assumed `getSeal` returns its fields starting at word 0,
+  but a single-struct return is ABI-encoded as a tuple: word 0 is the tuple offset (0x20) and the
+  string offset is relative to the tuple start. The old decoder threw on the live data.
+  `web/app.js` now skips the tuple offset (and `CONFIG.contract` is set to the deployed address).
+  Re-test after the fix — all flows pass: sha256Hex matches the sealed hash, sealCount = 1,
+  getSeal(0) decodes to sealer 0x41acE6E2…9928C8 / textHash 0xb72a12f2…98f826 / label "genesis" /
+  sealedAt 1795578694 / block 10705990, isSealed = true, first seal id 0, and the REST verify
+  flow renders code 0 + PQCHybridSignature present + `pqc_hybrid_verify: verified`.
+- Balances: 10 QOR → 9.9 after register → **9.722326 QOR** at end of phase
+  (total spent ≈ 0.2777 QOR: register 0.1 + open 0.1 + deploy/seal gas).
+  Window still live at end of phase (139 blocks, 3 txs left) — future seals can reuse it or
+  open a fresh window (each open is another hybrid tx).
+- Remaining-steps list above: items 2, 3, 4 are now DONE. Items 5–8 (public GitHub push,
+  demo hosting, video, submission form) remain for the later phases, unchanged.

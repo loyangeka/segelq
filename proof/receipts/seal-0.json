@@ -1,0 +1,13 @@
+{
+  "sealId": 0,
+  "text": "SegelQ genesis seal — 25 Nov 2026: QoreChain mainnet launches before Q-Day.",
+  "label": "genesis",
+  "textHashSha256": "0xb72a12f2d5f62446eec89ce8151dda410d1e2793b9cbf7e2402b12b51098f826",
+  "sealer": "0x41acE6E2BAC1C4A18f2863aBF3527595519928C8",
+  "contract": "0xe2379181fbf982268F2d966c3a1725D3fe6EAdf9",
+  "txHash": "0x18074cf46d4c7f0c0a459be55a4b22998e9cf121cabfc305be0efc5f627358d4",
+  "blockNumber": 10705990,
+  "status": "success",
+  "network": "qorechain-diana (EVM chain ID 9800)",
+  "sealedAtUtc": "2026-11-25T03:51:35.499Z"
+}
