@@ -9,7 +9,10 @@
     "test": "hardhat test",
     "window": "tsx --env-file=.env scripts/window.ts",
     "deploy:testnet": "hardhat ignition deploy ignition/modules/Counter.ts --network qorechainTestnet",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy:segelq": "hardhat ignition deploy ignition/modules/SegelQ.ts --network qorechainTestnet",
+    "seal": "tsx --env-file=.env scripts/seal.ts",
+    "verify-tx": "tsx scripts/verify-tx.ts"
   },
   "dependencies": {
     "@cosmjs/stargate": "^0.39.0",
